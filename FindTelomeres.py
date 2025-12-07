@@ -1,9 +1,11 @@
 """
+    https://github.com/JanaSperschneider/FindTelomeres
+
     A python script for finding telomeric repeats (TTAGGG/CCCTAA) in FASTA files
-    Copyright (C) 2019-2020 Jana Sperschneider  
-    This program is free software; you can redistribute it and/or modify  
-    it under the terms of the GNU General Public License as published by  
-    the Free Software Foundation; either version 3 of the License, or     
+    Copyright (C) 2019-2020 Jana Sperschneider
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,13 +24,22 @@ import argparse
 #--------------------------------------------
 #--------------------------------------------
 # Canonical motif is TTAGGG/CCCTAA, but one might see variation
-TELOMERES = ["C{2,4}T{1,2}A{1,3}", "T{1,3}A{1,2}G{2,4}"]
+#TELOMERES = ["C{2,4}T{1,2}A{1,3}", "T{1,3}A{1,2}G{2,4}"]
+#	     CCCTAA		   TTAGGG
+
+# Candida albicans telomeric repeat is 23bp. (https://www.mdpi.com/2073-4425/10/11/866)
+#	ACTTCTTGGTGTACGGATGTCTA
+#	TAGACATCCGTACACCAAGAAGT
+#TELOMERES = ["ACTTCTTGGTGTACGGATGTCTA", "TAGACATCCGTACACCAAGAAGT"]
+
+TELOMERES = ["TAGACATCCGTACACCAAGAAGT", "ACTTCTTGGTGTACGGATGTCTA"]
+
 #--------------------------------------------
 #--------------------------------------------
 #--------------------------------------------
 def findTelomere(sequence):
     '''
-    This function takes a nucleotide sequence and checks if the 
+    This function takes a nucleotide sequence and checks if the
     start and/or end of the sequence contain telomeric repeats.
     '''
     telomere_at_start, telomere_at_end = False, False
@@ -52,31 +63,31 @@ def findTelomere(sequence):
 
     # Look for telomeric repeats at the end of the sequence
     telomeric_repeats = re.findall(tel_reverse, sequence.upper()[(end_of_sequence_withoutNs-WINDOW):end_of_sequence_withoutNs])
-    # Calculate the % of nucleotides that are part of telomeric repeats    
-    percent_telomeric_repeats_end = 100.0*sum([len(repeat) for repeat in telomeric_repeats])/float(WINDOW) 
+    # Calculate the % of nucleotides that are part of telomeric repeats
+    percent_telomeric_repeats_end = 100.0*sum([len(repeat) for repeat in telomeric_repeats])/float(WINDOW)
 
     # If more than half of nucleotides at the start/end are telomeric repeats
     if percent_telomeric_repeats_start >= REPEAT_CUTOFF:
         telomere_at_start = True
     if percent_telomeric_repeats_end >= REPEAT_CUTOFF:
         telomere_at_end = True
-        
+
     return telomere_at_start, telomere_at_end, start_of_sequence_withoutNs, end_of_sequence_withoutNs
 #--------------------------------------------
 #--------------------------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument("FASTA_FILE", help="Supply a FASTA sequence file.")
-parser.add_argument("-w", "--window", type=int, help="This defines the number of first and last nucleotides that will get scanned for telomeric repeats (default: 50).")
+parser.add_argument("-w", "--window", type=int, help="This defines the number of first and last nucleotides that will get scanned for telomeric repeats (default: 250).")
 parser.add_argument("-c", "--cutoff", type=float, help='''A telomere is detected if >= c%% of the first (last) nucleotides are telomeric repeats (default: 50%%).''')
 args = parser.parse_args()
 #--------------------------------------------
 if args.cutoff == None:
-    REPEAT_CUTOFF = 50.0
+    REPEAT_CUTOFF = 10.0
 else:
     REPEAT_CUTOFF = args.cutoff
 
 if args.window == None:
-    WINDOW = 50
+    WINDOW = 250
 else:
     WINDOW = args.window
 #--------------------------------------------
@@ -86,7 +97,7 @@ sequences = [(str(record.description), str(record.seq).strip()) for record in Se
 
 number_forward, number_reverse = 0, 0
 print('##########')
-print(len(sequences), 'sequences to analyze for telomeric repeats (TTAGGG/CCCTAA) in file', FASTA_FILE)
+print(len(sequences), 'sequences to analyze for telomeric repeats (TAGACATCCGTACACCAAGAAGT/ACTTCTTGGTGTACGGATGTCTA) in file', FASTA_FILE)
 print('##########')
 print()
 #--------------------------------------------
@@ -99,7 +110,7 @@ for header, sequence in sequences:
         if forward == True:
             print(header, '\t', 'Forward (start of sequence)', '\t', sequence[start_of_sequence_withoutNs:start_of_sequence_withoutNs+WINDOW])
             number_forward += 1
-        if reverse == True:        
+        if reverse == True:
             print(header, '\t', 'Reverse (end of sequence)', '\t', sequence[(end_of_sequence_withoutNs-WINDOW):end_of_sequence_withoutNs])
             number_reverse += 1
 
