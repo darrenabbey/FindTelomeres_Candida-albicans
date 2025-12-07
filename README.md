@@ -5,7 +5,7 @@ The software is being updated in relation to in-process research, due to be subm
 
 #### What does this script do?
 
-This is a tool for finding telomeric repeats specific to Candida albicans () in FASTA files.
+This is a tool for finding telomeric repeats specific to Candida albicans (ACTTCTTGGTGTACGGATGTCTA) in FASTA files.
 
 #### What does this script NOT do?
 
@@ -20,7 +20,7 @@ The default settings of 50% (-c/--cutoff) and [***] nts (-w/--window) seem to wo
 
 The telomeric motifs are searched in the FASTA file using regular expressions. The search can be changed by editing one line in the script to suit other needs.
 * Human: C{2,4}T{1,2}A{1,3} and T{1,3}A{1,2}G{2,4}.
-* Candida albicans:
+* Candida albicans: ACTTCTTGGTGTACGGATGTCTA
 
 #### Installation and usage
 The script is written in Python 3 and requires BioPython (https://biopython.org/wiki/Download).
@@ -39,7 +39,7 @@ This will output:
 
 ```
 ##########
-2 sequences to analyze for telomeric repeats (TTAGGG/CCCTAA) in file test.fasta
+2 sequences to analyze for telomeric repeats (TAGACATCCGTACACCAAGAAGT/ACTTCTTGGTGTACGGATGTCTA) in file test.fasta
 ##########
 
 tig00000045 (contig with one telomere)           Forward (start of sequence)     acCTAACCTAACCTAACCTAACCCTAACCTAACCCTAACTAACCTAACCT
